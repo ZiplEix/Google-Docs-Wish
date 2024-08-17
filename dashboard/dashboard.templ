@@ -18,23 +18,7 @@ templ dashboardView(user users.User) {
 
             <link rel="stylesheet" href="/auth/style.css"/>
 
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const searchInput = document.querySelector('input[name="q"]');
-                    const searchResults = document.getElementById('search-results');
-
-                    searchInput.addEventListener('focus', function () {
-                        searchResults.classList.remove('hidden');
-                    });
-
-                    searchInput.addEventListener('blur', function () {
-                        // On utilise setTimeout pour permettre au clic sur un résultat de se produire avant de cacher les résultats
-                        setTimeout(() => {
-                            searchResults.classList.add('hidden');
-                        }, 100);
-                    });
-                });
-            </script>
+            <script src="dashboard/close_search_result.js"></script>
 
             <title>Gdoc Wish</title>
         </head>
@@ -76,7 +60,28 @@ templ dashboardView(user users.User) {
                 </div>
             </header>
             <main>
-                <h1>Random truc</h1>
+                <div id="create-doc" class="w-full bg-base-200 py-8 mb-8">
+                    <div class="flex justify-center">
+                        <div class="max-w-5xl">
+                            <button hx-get="/document/create-new" class="card w-full bg-base-100 shadow-xl h-80">
+                                <div class="card-body flex items-center justify-center">
+                                    <div class="flex flex-col items-center">
+                                        <img src="/dashboard/plus_black.png" alt="Create Document" class="w-40 h-40 mb-4" />
+                                        <div class="divider"></div>
+                                        <h2 class="card-title text-lg font-bold">Create a New Document</h2>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="select-doc" class="w-full">
+                    <div class="flex justify-center">
+                        <div class="max-w-5xl">
+                            the documents
+                        </div>
+                    </div>
+                </div>
             </main>
         </body>
     </html>
