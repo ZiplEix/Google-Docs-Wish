@@ -4,7 +4,7 @@ import "github.com/ZiplEix/Google-Docs-Wish/users"
 
 templ dashboardView(user users.User) {
     <!DOCTYPE html>
-    <html lang="en" data-theme="dark">
+    <html lang="en" data-theme="light">
         <head>
             <meta charset="UTF-8"/>
             <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
@@ -18,19 +18,65 @@ templ dashboardView(user users.User) {
 
             <link rel="stylesheet" href="/auth/style.css"/>
 
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const searchInput = document.querySelector('input[name="q"]');
+                    const searchResults = document.getElementById('search-results');
+
+                    searchInput.addEventListener('focus', function () {
+                        searchResults.classList.remove('hidden');
+                    });
+
+                    searchInput.addEventListener('blur', function () {
+                        // On utilise setTimeout pour permettre au clic sur un résultat de se produire avant de cacher les résultats
+                        setTimeout(() => {
+                            searchResults.classList.add('hidden');
+                        }, 100);
+                    });
+                });
+            </script>
+
             <title>Gdoc Wish</title>
         </head>
 
 
         <body>
             <header>
-            </header>
-            <main>
-                <div class="grid h-screen place-items-center">
-                    <div class="flex flex-col items-center space-y-4">
-                        <h1 class="text-5xl font-bold mb-16">Connected as { user.Email }</h1>
+                <div class="navbar bg-base-100">
+                    <a class="btn btn-ghost text-xl">Gdoc Wish</a>
+                    <div class="flex-1 justify-center">
+                            <div class="w-2/3">
+                                <input
+                                    type="text"
+                                    name="q"
+                                    placeholder="Search"
+                                    class="input w-full h-12 px-4 py-2 rounded-full bg-base-200 focus:bg-base-100 focus:shadow-md focus:outline-none focus:ring-0 focus:border-transparent"
+                                    hx-get="/dashboard/search"
+                                    hx-trigger="keyup changed"
+                                    hx-target="#search-results"
+                                    hx-swap="innerHTML"
+                                />
+                                <div id="search-results" class="absolute w-3/5 mt-2 bg-base-100 shadow-lg rounded-lg z-[1] hidden"></div>
+                            </div>
+                    </div>
+                    <div class="flex-none gap-2">
+                        <div class="dropdown dropdown-end">
+                            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+                                <div class="w-10 rounded-full">
+                                    <img alt="Menu button" src="/persona-black.png" />
+                                </div>
+                            </div>
+                            <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[2] mt-3 w-52 p-2 shadow">
+                                <li><a>Profile</a></li>
+                                <li><a>Settings</a></li>
+                                <li><a>Logout</a></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
+            </header>
+            <main>
+                <h1>Random truc</h1>
             </main>
         </body>
     </html>
