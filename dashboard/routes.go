@@ -94,6 +94,28 @@ func generateDocumentLIstTile(doc *database.Document, image, url string) string 
 		`
 }
 
+func generatePath(rootId string) string {
+	currentDirectory, _ := database.GetDocumentFromId(rootId)
+
+	html := `<nav class="flex items-center text-base text-gray-500 mb-4">`
+
+	path := `<span class="mx-2">/</span>` +
+		`<a href="/dashboard/` + currentDirectory.ID + `" class="text-blue-500 hover:text-blue-700">` + currentDirectory.Title + `</a>`
+
+	for currentDirectory.RootId != `root` {
+		currentDirectory, _ = database.GetDocumentFromId(currentDirectory.RootId)
+		path = `<span class="mx-2">/</span>` +
+			`<a href="/dashboard/` + currentDirectory.ID + `" class="text-blue-500 hover:text-blue-700">` + currentDirectory.Title + `</a>` +
+			path
+	}
+
+	path = `<a href="/dashboard" class="text-blue-500 hover:text-blue-700">Home</a>` + path
+
+	html += path + `</nav>`
+
+	return html
+}
+
 func generateDocumentListHtml(user database.User, rootId string) string {
 	documents, err := database.GetDocumentFromUserId(user.ID, rootId)
 	if err != nil {
@@ -104,22 +126,7 @@ func generateDocumentListHtml(user database.User, rootId string) string {
 	html += "<div class='w-5/6'>"
 
 	if rootId != "root" {
-		parentDirectory, err := database.GetDocumentFromId(rootId)
-		if err != nil {
-			return ""
-		}
-
-		html += `
-			<div class="flex items-center w-full h-auto px-4 py-3 rounded-3xl bg-base-200 mb-4 shadow-sm">
-				<!-- Document Icon -->
-				<img src="/ui/directory_icon.png" class="w-10 h-10 mr-2" alt="Document Icon">
-
-				<!-- Document Info -->
-				<a href="/dashboard/` + parentDirectory.RootId + `" class="flex-1">
-					<p class="text-lg font-semibold">..</p>
-				</a>
-			</div>
-		`
+		html += generatePath(rootId)
 	}
 
 	for _, doc := range documents {
