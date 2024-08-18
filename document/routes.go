@@ -45,8 +45,20 @@ func createNewDocument(c *fiber.Ctx) error {
 
 func deleteDocument(c *fiber.Ctx) error {
 	docId := c.Params("docId")
+	userId := c.Locals("userID").(string)
 
-	err := database.DeleteDocumentById(docId)
+	// get the document to delete
+	doc, err := database.GetDocumentFromId(docId)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	// check if the user is the author of the document
+	if doc.UserId != userId {
+		return c.Status(fiber.StatusUnauthorized).SendString("You are not the author of this document")
+	}
+
+	err = database.DeleteDocumentById(docId)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
