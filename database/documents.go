@@ -191,6 +191,7 @@ func SearchDocument(query string, userId string) ([]*Document, error) {
 		title := strings.ToLower(doc.Data()["title"].(string))
 		if strings.Contains(title, query) {
 			document := NewDocument(doc.Data(), doc.Ref.ID)
+			document.LastModified = doc.UpdateTime
 			documents = append(documents, document)
 		}
 	}

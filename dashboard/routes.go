@@ -43,9 +43,31 @@ func dashboardSearch(c *fiber.Ctx) error {
 	}
 
 	for _, res := range results {
+		image := "/ui/"
+
+		switch res.Type {
+		case "directory":
+			image += "directory_icon.png"
+		case "document":
+			image += "doc_icon.png"
+		case "spreadsheet":
+			image += "xls_icon.png"
+		case "pdf":
+			image += "pdf_icon.png"
+		default:
+			image += "doc_icon.png"
+		}
+
+		url := "/document/" + res.ID
+		if res.Type == "directory" {
+			url = "/dashboard/" + res.ID
+		}
+
 		html += `
-            <a href="/document/` + res.ID + `" class="block p-4 border-b border-base-300 hover:bg-base-200 transition-colors duration-200">
+            <a href="` + url + `" class="block p-4 border-b border-base-300 hover:bg-base-200 transition-colors duration-200">
                 <div class="flex justify-between items-start">
+					<img src="` + image + `" class="w-10 h-10 mr-2" alt="Document Icon">
+
                     <div class="flex-1">
                         <div class="font-semibold text-lg text-blue-600">
                             ` + res.Title + `
@@ -54,6 +76,7 @@ func dashboardSearch(c *fiber.Ctx) error {
                             ` + res.Author + `
                         </p>
                     </div>
+
                     <p class="text-sm text-gray-500">
                         ` + res.LastModified.Format("January 2, 2006") + `
                     </p>
