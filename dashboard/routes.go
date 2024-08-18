@@ -2,7 +2,6 @@ package dashboard
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/ZiplEix/Google-Docs-Wish/database"
 	"github.com/ZiplEix/Google-Docs-Wish/middleware"
@@ -80,7 +79,7 @@ func generateDocumentListHtml(user database.User) string {
 				<!-- Document Info -->
 				<a href="/document/` + doc.ID + `" class="flex-1">
 					<p class="text-lg font-semibold">` + doc.Title + `</p>
-					<p class="text-sm text-gray-500">Last modified on ` + time.Now().Format("2 January 2006") + `</p>
+					<p class="text-sm text-gray-500">Last modified on ` + doc.LastModified.Format("2 January 2006") + `</p>
 				</a>
 
 				<!-- Dropdown Menu -->

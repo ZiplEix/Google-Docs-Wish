@@ -83,6 +83,7 @@ func CreateNewDocInDb(userId string) (*Document, error) {
 	fmt.Printf("Document created: %v\n", wr)
 
 	doc.ID = docRef.ID
+	doc.LastModified = time.Now()
 
 	_, err = docRef.Set(context.Background(), doc.ToMap())
 	if err != nil {
@@ -120,6 +121,7 @@ func GetDocumentFromUserId(userId string) ([]*Document, error) {
 	var documents []*Document
 	for _, doc := range docs {
 		document := NewDocument(doc.Data(), doc.Ref.ID)
+		document.LastModified = doc.UpdateTime
 		documents = append(documents, document)
 	}
 
