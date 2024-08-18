@@ -11,8 +11,8 @@ import (
 func DashboardRoutes(app *fiber.App) {
 	dashboardGroup := app.Group("/dashboard", middleware.Protected())
 	dashboardGroup.Get("/", dashboardPage)
-	dashboardGroup.Get("/:rootId", dashboardPage)
 	dashboardGroup.Get("/search", dashboardSearch)
+	dashboardGroup.Get("/:rootId", dashboardPage)
 }
 
 func dashboardSearch(c *fiber.Ctx) error {
@@ -94,16 +94,25 @@ func generateDocumentLIstTile(doc *database.Document, image, url string) string 
 		`
 }
 
-func generatePath(rootId string) string {
-	currentDirectory, _ := database.GetDocumentFromId(rootId)
+func generateBreadcrumbPath(rootId string) string {
+	currentDirectory, err := database.GetDocumentFromId(rootId)
+	if err != nil || currentDirectory == nil {
+		return `<nav class='flex items-center text-sm text-gray-500'><a href='/dashboard' class='text-blue-500 hover:text-blue-700'>Home</a></nav>`
+	}
 
 	html := `<nav class="flex items-center text-base text-gray-500 mb-4">`
 
-	path := `<span class="mx-2">/</span>` +
-		`<a href="/dashboard/` + currentDirectory.ID + `" class="text-blue-500 hover:text-blue-700">` + currentDirectory.Title + `</a>`
+	path := `
+		<span class="mx-2">/</span>` +
+		`<a href="/dashboard/` + currentDirectory.ID + `" class="text-blue-500 hover:text-blue-700">` + currentDirectory.Title + `</a>
+	`
 
 	for currentDirectory.RootId != `root` {
-		currentDirectory, _ = database.GetDocumentFromId(currentDirectory.RootId)
+		currentDirectory, err = database.GetDocumentFromId(currentDirectory.RootId)
+		if err != nil || currentDirectory == nil {
+			break
+		}
+
 		path = `<span class="mx-2">/</span>` +
 			`<a href="/dashboard/` + currentDirectory.ID + `" class="text-blue-500 hover:text-blue-700">` + currentDirectory.Title + `</a>` +
 			path
@@ -126,7 +135,7 @@ func generateDocumentListHtml(user database.User, rootId string) string {
 	html += "<div class='w-5/6'>"
 
 	if rootId != "root" {
-		html += generatePath(rootId)
+		html += generateBreadcrumbPath(rootId)
 	}
 
 	for _, doc := range documents {
