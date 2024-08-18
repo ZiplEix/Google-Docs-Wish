@@ -12,7 +12,7 @@ func DocumentRoutes(app *fiber.App) {
 	dashboardGroup := app.Group("/document", middleware.Protected())
 	dashboardGroup.Get("/", redirectToDashboard)
 	dashboardGroup.Get("/:docId", documentPage)
-	dashboardGroup.Post("/create-new", createNewDocument)
+	dashboardGroup.Post("/create-new/:rootId", createNewDocument)
 	dashboardGroup.Delete("/:docId", deleteDocument)
 }
 
@@ -29,8 +29,10 @@ func documentPage(c *fiber.Ctx) error {
 
 func createNewDocument(c *fiber.Ctx) error {
 	userId := c.Locals("userID").(string)
+	rootId := c.Params("rootId")
+	tipe := c.FormValue("type")
 
-	doc, err := database.CreateNewDocInDb(userId)
+	doc, err := database.CreateNewDocInDb(userId, rootId, tipe)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}

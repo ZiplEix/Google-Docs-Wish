@@ -13,6 +13,8 @@ type Document struct {
 	UserId       string
 	LastModified time.Time
 	Author       string
+	Type         string
+	RootId       string
 }
 
 func NewDocument(data map[string]interface{}, id ...string) *Document {
@@ -22,6 +24,8 @@ func NewDocument(data map[string]interface{}, id ...string) *Document {
 		UserId:       "",
 		LastModified: time.Time{},
 		Author:       "",
+		Type:         "",
+		RootId:       "",
 	}
 
 	if title, ok := data["title"].(string); ok {
@@ -50,6 +54,14 @@ func NewDocument(data map[string]interface{}, id ...string) *Document {
 		doc.Author = author
 	}
 
+	if docType, ok := data["type"].(string); ok {
+		doc.Type = docType
+	}
+
+	if rootId, ok := data["rootId"].(string); ok {
+		doc.RootId = rootId
+	}
+
 	return doc
 }
 
@@ -60,19 +72,47 @@ func (doc *Document) ToMap() map[string]interface{} {
 		"userId":        doc.UserId,
 		"last_modified": doc.LastModified,
 		"author":        doc.Author,
+		"type":          doc.Type,
+		"rootId":        doc.RootId,
 	}
 }
 
-func CreateNewDocInDb(userId string) (*Document, error) {
+func GetDocumentFromId(docId string) (*Document, error) {
+	docRef := FirestoreClient.Collection("documents").Doc(docId)
+	doc, err := docRef.Get(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("error getting document: %v", err)
+	}
+
+	document := NewDocument(doc.Data(), doc.Ref.ID)
+
+	return document, nil
+}
+
+func CreateNewDocInDb(userId string, rootId string, tipe string) (*Document, error) {
 	user, err := GetUserFromId(userId)
 	if err != nil {
 		return nil, fmt.Errorf("error getting user: %v", err)
 	}
 
+	var name string
+	switch tipe {
+	case "document":
+		name = "New Document"
+	case "spreadsheet":
+		name = "New Spreadsheet"
+	case "directory":
+		name = "New Directory"
+	default:
+		name = "New Document"
+	}
+
 	doc := NewDocument(map[string]interface{}{
-		"title":  "New Document",
+		"title":  name,
 		"userId": userId,
 		"author": user.Email,
+		"rootId": rootId,
+		"type":   tipe,
 	})
 
 	docRef, wr, err := FirestoreClient.Collection("documents").Add(context.Background(), doc.ToMap())
@@ -111,8 +151,8 @@ func (doc *Document) CreateInDb() (string, error) {
 	return doc.ID, nil
 }
 
-func GetDocumentFromUserId(userId string) ([]*Document, error) {
-	docsIter := FirestoreClient.Collection("documents").Where("userId", "==", userId).Documents(context.Background())
+func GetDocumentFromUserId(userId string, rootId string) ([]*Document, error) {
+	docsIter := FirestoreClient.Collection("documents").Where("userId", "==", userId).Where("rootId", "==", rootId).Documents(context.Background())
 	docs, err := docsIter.GetAll()
 	if err != nil {
 		return nil, fmt.Errorf("error getting documents: %v", err)

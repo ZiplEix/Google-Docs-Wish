@@ -11,6 +11,7 @@ import (
 func DashboardRoutes(app *fiber.App) {
 	dashboardGroup := app.Group("/dashboard", middleware.Protected())
 	dashboardGroup.Get("/", dashboardPage)
+	dashboardGroup.Get("/:rootId", dashboardPage)
 	dashboardGroup.Get("/search", dashboardSearch)
 }
 
@@ -64,20 +65,14 @@ func dashboardSearch(c *fiber.Ctx) error {
 	return c.SendString(html)
 }
 
-func generateDocumentListHtml(user database.User) string {
-	documents, err := database.GetDocumentFromUserId(user.ID)
-	if err != nil {
-		return ""
-	}
+func generateDocumentLIstTile(doc *database.Document, image, url string) string {
+	return `
+			<div id="doc-` + doc.ID + `" class="flex items-center w-full h-auto px-4 py-3 rounded-3xl bg-base-200 mb-4 shadow-sm">
+				<!-- Document Icon -->
+				<img src="` + image + `" class="w-10 h-10 mr-2" alt="Document Icon">
 
-	var html string
-	html += "<div class='w-5/6'>"
-
-	for _, doc := range documents {
-		html += `
-			<div id="doc-` + doc.ID + `" class="flex items-center w-full h-auto px-4 py-3 rounded-3xl bg-base-200 mb-4 shadow-sm pl-6">
 				<!-- Document Info -->
-				<a href="/document/` + doc.ID + `" class="flex-1">
+				<a href="` + url + `" class="flex-1">
 					<p class="text-lg font-semibold">` + doc.Title + `</p>
 					<p class="text-sm text-gray-500">Last modified on ` + doc.LastModified.Format("2 January 2006") + `</p>
 				</a>
@@ -97,6 +92,58 @@ func generateDocumentListHtml(user database.User) string {
 				</div>
 			</div>
 		`
+}
+
+func generateDocumentListHtml(user database.User, rootId string) string {
+	documents, err := database.GetDocumentFromUserId(user.ID, rootId)
+	if err != nil {
+		return ""
+	}
+
+	var html string
+	html += "<div class='w-5/6'>"
+
+	if rootId != "root" {
+		parentDirectory, err := database.GetDocumentFromId(rootId)
+		if err != nil {
+			return ""
+		}
+
+		html += `
+			<div class="flex items-center w-full h-auto px-4 py-3 rounded-3xl bg-base-200 mb-4 shadow-sm">
+				<!-- Document Icon -->
+				<img src="/ui/directory_icon.png" class="w-10 h-10 mr-2" alt="Document Icon">
+
+				<!-- Document Info -->
+				<a href="/dashboard/` + parentDirectory.RootId + `" class="flex-1">
+					<p class="text-lg font-semibold">..</p>
+				</a>
+			</div>
+		`
+	}
+
+	for _, doc := range documents {
+		image := "/ui/"
+
+		switch doc.Type {
+		case "directory":
+			image += "directory_icon.png"
+		case "document":
+			image += "doc_icon.png"
+		case "spreadsheet":
+			image += "xls_icon.png"
+		case "pdf":
+			image += "pdf_icon.png"
+		default:
+			image += "doc_icon.png"
+		}
+
+		url := "/document/" + doc.ID
+		if doc.Type == "directory" {
+			url = "/dashboard/" + doc.ID
+		}
+
+		html += generateDocumentLIstTile(doc, image, url)
 	}
 
 	html += "</div>"

@@ -2,7 +2,7 @@ package dashboard
 
 import "github.com/ZiplEix/Google-Docs-Wish/database"
 
-templ dashboardView(user database.User) {
+templ dashboardView(user database.User, rootId string) {
     <!DOCTYPE html>
     <html lang="en" data-theme="light">
         <head>
@@ -18,7 +18,7 @@ templ dashboardView(user database.User) {
 
             <link rel="stylesheet" href="/auth/style.css"/>
 
-            <script src="dashboard/close_search_result.js"></script>
+            <script src="/dashboard/close_search_result.js"></script>
 
             <title>Gdoc Wish</title>
         </head>
@@ -63,17 +63,33 @@ templ dashboardView(user database.User) {
             </header>
             <main>
                 <div id="create-doc" class="w-full bg-base-200 py-8 mb-4">
-                    <div class="flex justify-center">
+                    <div class="flex justify-center gap-6">
                         <div class="max-w-5xl">
                             <button
-                                hx-post="/document/create-new"
+                                hx-post={ "/document/create-new/" + rootId }
+                                hx-vals={ `{"type": "document"}` }
                                 class="card w-full bg-base-100 shadow-xl h-80 transform transition-transform duration-300 ease-in-out hover:scale-105"
                             >
                                 <div class="card-body flex items-center justify-center">
                                     <div class="flex flex-col items-center">
-                                        <img src="/dashboard/plus_black.png" alt="Create Document" class="w-40 h-40 mb-4" />
+                                        <img src="/ui/doc_icon.png" alt="Create Document" class="w-40 h-40 mb-4" />
                                         <div class="divider"></div>
                                         <h2 class="card-title text-lg font-bold">Create a New Document</h2>
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="max-w-5xl">
+                            <button
+                                hx-post={ "/document/create-new/" + rootId }
+                                hx-vals={ `{"type": "directory"}` }
+                                class="card w-full bg-base-100 shadow-xl h-80 transform transition-transform duration-300 ease-in-out hover:scale-105"
+                            >
+                                <div class="card-body flex items-center justify-center">
+                                    <div class="flex flex-col items-center">
+                                        <img src="/ui/directory_icon.png" alt="Create Document" class="w-40 h-40 mb-4" />
+                                        <div class="divider"></div>
+                                        <h2 class="card-title text-lg font-bold">Create a New Directory</h2>
                                     </div>
                                 </div>
                             </button>
@@ -82,7 +98,7 @@ templ dashboardView(user database.User) {
                 </div>
                 <div id="select-doc" class="w-full">
                     <div class="flex justify-center">
-                        @templ.Raw(generateDocumentListHtml(user))
+                        @templ.Raw(generateDocumentListHtml(user, rootId))
                     </div>
                 </div>
             </main>

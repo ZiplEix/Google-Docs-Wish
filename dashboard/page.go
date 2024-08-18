@@ -22,13 +22,18 @@ func getUserFromCookie(c *fiber.Ctx) (database.User, error) {
 
 func dashboardPage(c *fiber.Ctx) error {
 	user, err := getUserFromCookie(c)
+	rootId := c.Params("rootId")
+
+	if rootId == "" {
+		rootId = "root"
+	}
 
 	if err != nil {
 		c.Set("HX-Redirect", "/auth/signin")
 		return c.Status(fiber.StatusInternalServerError).Redirect("/auth/signin")
 	}
 
-	page := dashboardView(user)
+	page := dashboardView(user, rootId)
 	handler := adaptor.HTTPHandler(templ.Handler(page))
 
 	return handler(c)
