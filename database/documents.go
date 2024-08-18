@@ -94,3 +94,13 @@ func GetDocumentFromUserId(userId string) ([]*Document, error) {
 
 	return documents, nil
 }
+
+func DeleteDocumentById(docId string) error {
+	docRef := FirestoreClient.Collection("documents").Doc(docId)
+	_, err := docRef.Delete(context.Background())
+	if err != nil {
+		return fmt.Errorf("error deleting document: %v", err)
+	}
+
+	return nil
+}

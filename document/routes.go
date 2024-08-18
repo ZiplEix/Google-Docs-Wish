@@ -13,6 +13,7 @@ func DocumentRoutes(app *fiber.App) {
 	dashboardGroup.Get("/", redirectToDashboard)
 	dashboardGroup.Get("/:docId", documentPage)
 	dashboardGroup.Post("/create-new", createNewDocument)
+	dashboardGroup.Delete("/:docId", deleteDocument)
 }
 
 func redirectToDashboard(c *fiber.Ctx) error {
@@ -38,4 +39,15 @@ func createNewDocument(c *fiber.Ctx) error {
 
 	c.Set("HX-Redirect", "/document/"+doc.ID)
 	return c.SendStatus(fiber.StatusCreated)
+}
+
+func deleteDocument(c *fiber.Ctx) error {
+	docId := c.Params("docId")
+
+	err := database.DeleteDocumentById(docId)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	return c.Status(fiber.StatusOK).Send(nil)
 }

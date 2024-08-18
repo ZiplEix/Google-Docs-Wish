@@ -93,12 +93,11 @@ func generateDocumentListHtml(user database.User) string {
 	}
 
 	var html string
-
 	html += "<div class='w-5/6'>"
 
 	for _, doc := range documents {
 		html += `
-			<div class="flex items-center w-full h-auto px-4 py-3 rounded-3xl bg-base-200 mb-4 shadow-sm pl-6">
+			<div id="doc-` + doc.ID + `" class="flex items-center w-full h-auto px-4 py-3 rounded-3xl bg-base-200 mb-4 shadow-sm pl-6">
 				<!-- Document Info -->
 				<a href="/document/` + doc.ID + `" class="flex-1">
 					<p class="text-lg font-semibold">` + doc.Title + `</p>
@@ -114,7 +113,7 @@ func generateDocumentListHtml(user database.User) string {
 					</label>
 					<ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-48">
 						<li><a href="/document/` + doc.ID + `" target="_blank">Open in New Tab</a></li>
-						<li><a href="#" onclick="deleteDocument('` + doc.ID + `')">Delete Document</a></li>
+						<li><a href="#" hx-delete="/document/` + doc.ID + `" hx-target="#doc-` + doc.ID + `" hx-swap="outerHTML">Delete Document</a></li>
 						<li><a href="#" onclick="renameDocument('` + doc.ID + `')">Rename Document</a></li>
 					</ul>
 				</div>
@@ -123,6 +122,5 @@ func generateDocumentListHtml(user database.User) string {
 	}
 
 	html += "</div>"
-
 	return html
 }
