@@ -1,8 +1,8 @@
 package dashboard
 
-import "github.com/ZiplEix/Google-Docs-Wish/users"
+import "github.com/ZiplEix/Google-Docs-Wish/database"
 
-templ dashboardView(user users.User) {
+templ dashboardView(user database.User) {
     <!DOCTYPE html>
     <html lang="en" data-theme="light">
         <head>
@@ -60,10 +60,13 @@ templ dashboardView(user users.User) {
                 </div>
             </header>
             <main>
-                <div id="create-doc" class="w-full bg-base-200 py-8 mb-8">
+                <div id="create-doc" class="w-full bg-base-200 py-8 mb-4">
                     <div class="flex justify-center">
                         <div class="max-w-5xl">
-                            <button hx-get="/document/create-new" class="card w-full bg-base-100 shadow-xl h-80">
+                            <button
+                                hx-post="/document/create-new"
+                                class="card w-full bg-base-100 shadow-xl h-80 transform transition-transform duration-300 ease-in-out hover:scale-105"
+                            >
                                 <div class="card-body flex items-center justify-center">
                                     <div class="flex flex-col items-center">
                                         <img src="/dashboard/plus_black.png" alt="Create Document" class="w-40 h-40 mb-4" />
@@ -77,9 +80,7 @@ templ dashboardView(user users.User) {
                 </div>
                 <div id="select-doc" class="w-full">
                     <div class="flex justify-center">
-                        <div class="max-w-5xl">
-                            the documents
-                        </div>
+                        @templ.Raw(generateDocumentListHtml(user))
                     </div>
                 </div>
             </main>

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/ZiplEix/Google-Docs-Wish/database"
-	"github.com/ZiplEix/Google-Docs-Wish/users"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
@@ -35,7 +34,7 @@ func verifyPassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-func setTokenCookie(c *fiber.Ctx, user users.User) error {
+func setTokenCookie(c *fiber.Ctx, user database.User) error {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"exp": time.Now().Add(time.Hour * 24).Unix(),
 		"iat": time.Now().Unix(),
@@ -95,7 +94,7 @@ func signin(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString("Internal server error, please try again later")
 	}
 
-	user := users.New(docs[0].Data(), docs[0].Ref.ID)
+	user := database.NewUser(docs[0].Data(), docs[0].Ref.ID)
 
 	err = verifyPassword(user.Password, password)
 	if err != nil {
@@ -156,7 +155,7 @@ func signup(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString("Internal server error, please try again later")
 	}
 
-	user := users.New(map[string]interface{}{
+	user := database.NewUser(map[string]interface{}{
 		"email":    email,
 		"password": hashedPassword,
 	})

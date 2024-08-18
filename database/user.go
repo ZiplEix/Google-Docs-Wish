@@ -1,10 +1,8 @@
-package users
+package database
 
 import (
 	"context"
 	"fmt"
-
-	"github.com/ZiplEix/Google-Docs-Wish/database"
 )
 
 type User struct {
@@ -13,7 +11,7 @@ type User struct {
 	ID       string
 }
 
-func New(data map[string]interface{}, id ...string) *User {
+func NewUser(data map[string]interface{}, id ...string) *User {
 	user := &User{
 		Email:    "",
 		Password: "",
@@ -39,11 +37,12 @@ func (user *User) ToMap() map[string]interface{} {
 	return map[string]interface{}{
 		"email":    user.Email,
 		"password": user.Password,
+		"id":       user.ID,
 	}
 }
 
 func (user *User) CreateInDb() (string, error) {
-	docRef, wr, err := database.FirestoreClient.Collection("users").Add(context.Background(), user.ToMap())
+	docRef, wr, err := FirestoreClient.Collection("users").Add(context.Background(), user.ToMap())
 	if err != nil {
 		return "", fmt.Errorf("error creating user: %v", err)
 	}
@@ -51,6 +50,11 @@ func (user *User) CreateInDb() (string, error) {
 	fmt.Printf("User created: %v\n", wr)
 
 	user.ID = docRef.ID
+
+	_, err = docRef.Set(context.Background(), user.ToMap())
+	if err != nil {
+		return "", fmt.Errorf("error updating user: %v", err)
+	}
 
 	return docRef.ID, nil
 }
