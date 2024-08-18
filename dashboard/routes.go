@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/ZiplEix/Google-Docs-Wish/database"
@@ -17,38 +18,16 @@ func DashboardRoutes(app *fiber.App) {
 func dashboardSearch(c *fiber.Ctx) error {
 	query := c.Query("q")
 
-	type result struct {
-		Title  string
-		Link   string
-		Date   time.Time
-		Author string
+	if query == "" {
+		return c.SendString("")
 	}
 
-	results := []result{
-		{
-			Title:  query,
-			Link:   "https://www.google.com",
-			Date:   time.Now(),
-			Author: "Client",
-		},
-		{
-			Title:  "Test",
-			Link:   "https://www.google.com",
-			Date:   time.Now(),
-			Author: "Author 1",
-		},
-		{
-			Title:  "Test 2",
-			Link:   "https://www.google.com",
-			Date:   time.Now(),
-			Author: "Author 2",
-		},
-		{
-			Title:  "Test 3",
-			Link:   "https://www.google.com",
-			Date:   time.Now(),
-			Author: "Author 3",
-		},
+	userId := c.Locals("userID").(string)
+
+	results, err := database.SearchDocument(query, userId)
+	if err != nil {
+		fmt.Printf("error searching documents: %v\n", err)
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
 	var html string
@@ -65,7 +44,7 @@ func dashboardSearch(c *fiber.Ctx) error {
 
 	for _, res := range results {
 		html += `
-            <a href="` + res.Link + `" class="block p-4 border-b border-base-300 hover:bg-base-200 transition-colors duration-200">
+            <a href="/document/` + res.ID + `" class="block p-4 border-b border-base-300 hover:bg-base-200 transition-colors duration-200">
                 <div class="flex justify-between items-start">
                     <div class="flex-1">
                         <div class="font-semibold text-lg text-blue-600">
@@ -76,7 +55,7 @@ func dashboardSearch(c *fiber.Ctx) error {
                         </p>
                     </div>
                     <p class="text-sm text-gray-500">
-                        ` + res.Date.Format("January 2, 2006") + `
+                        ` + res.LastModified.Format("January 2, 2006") + `
                     </p>
                 </div>
             </a>

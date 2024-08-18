@@ -41,6 +41,17 @@ func (user *User) ToMap() map[string]interface{} {
 	}
 }
 
+func GetUserFromId(id string) (*User, error) {
+	state, err := FirestoreClient.Doc("users/" + id).Get(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	user := NewUser(state.Data(), state.Ref.ID)
+
+	return user, nil
+}
+
 func (user *User) CreateInDb() (string, error) {
 	docRef, wr, err := FirestoreClient.Collection("users").Add(context.Background(), user.ToMap())
 	if err != nil {
