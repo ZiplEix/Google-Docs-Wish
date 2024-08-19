@@ -11,11 +11,14 @@ import (
 func DocumentRoutes(app *fiber.App) {
 	dashboardGroup := app.Group("/document", middleware.Protected())
 	dashboardGroup.Get("/", redirectToDashboard)
-	dashboardGroup.Get("/:docId", documentPage)
 	dashboardGroup.Post("/create-new/:rootId", createNewDocument)
 	dashboardGroup.Delete("/:docId", deleteDocument)
 	dashboardGroup.Get("/rename/rename_modal/:docId", renameModal)
 	dashboardGroup.Post("rename/:docId", renameDocument)
+
+	// document edit page
+	editDocGroup := dashboardGroup.Group("/e")
+	editDocGroup.Get("/:docId", documentPage)
 }
 
 func redirectToDashboard(c *fiber.Ctx) error {
