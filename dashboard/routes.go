@@ -58,9 +58,11 @@ func dashboardSearch(c *fiber.Ctx) error {
 			image += "doc_icon.png"
 		}
 
-		url := "/document/" + res.ID
+		var url string
 		if res.Type == "directory" {
 			url = "/dashboard/" + res.ID
+		} else {
+			url = "/document/e/" + res.ID
 		}
 
 		html += `
@@ -177,9 +179,11 @@ func generateDocumentListHtml(user database.User, rootId string) string {
 			image += "doc_icon.png"
 		}
 
-		url := "/document/" + doc.ID
+		var url string
 		if doc.Type == "directory" {
 			url = "/dashboard/" + doc.ID
+		} else {
+			url = "/document/e/" + doc.ID
 		}
 
 		html += generateDocumentLIstTile(doc, image, url)
