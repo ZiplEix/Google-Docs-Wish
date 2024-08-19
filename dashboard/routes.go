@@ -96,7 +96,7 @@ func generateDocumentLIstTile(doc *database.Document, image, url string) string 
 
 				<!-- Document Info -->
 				<a href="` + url + `" class="flex-1">
-					<p class="text-lg font-semibold">` + doc.Title + `</p>
+					<p class="text-lg font-semibold" id="title-` + doc.ID + `">` + doc.Title + `</p>
 					<p class="text-sm text-gray-500">Last modified on ` + doc.LastModified.Format("2 January 2006") + `</p>
 				</a>
 
@@ -110,7 +110,7 @@ func generateDocumentLIstTile(doc *database.Document, image, url string) string 
 					<ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-48">
 						<li><a href="/document/` + doc.ID + `" target="_blank">Open in New Tab</a></li>
 						<li><a href="#" hx-delete="/document/` + doc.ID + `" hx-target="#doc-` + doc.ID + `" hx-swap="outerHTML">Delete Document</a></li>
-						<li><a href="#" onclick="renameDocument('` + doc.ID + `')">Rename Document</a></li>
+						<li><a hx-get="/document/rename/rename_modal/` + doc.ID + `" hx-target="body" hx-swap="beforeend">Rename Document</a></li>
 					</ul>
 				</div>
 			</div>

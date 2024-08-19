@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"cloud.google.com/go/firestore"
 )
 
 type Document struct {
@@ -197,4 +199,16 @@ func SearchDocument(query string, userId string) ([]*Document, error) {
 	}
 
 	return documents, nil
+}
+
+func RenameDocumentById(docId string, newName string) error {
+	docRef := FirestoreClient.Collection("documents").Doc(docId)
+	_, err := docRef.Update(context.Background(), []firestore.Update{
+		{Path: "title", Value: newName},
+	})
+	if err != nil {
+		return fmt.Errorf("error renaming document: %v", err)
+	}
+
+	return nil
 }
