@@ -17,6 +17,22 @@ templ documentView(user database.User, doc database.Document) {
             <script src="https://unpkg.com/htmx.org@2.0.0" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
 
             <title>{ doc.Title } - Gdoc Wish</title>
+
+            <style>
+                .page {
+                    outline: none;
+                    border: none; /* Assurez-vous qu'aucun bord ne s'affiche */
+                    padding: 25mm;
+                    font-family: 'Roboto', sans-serif;
+                    box-sizing: border-box;
+                    height: 100%; /* Assurez-vous que la hauteur est relative au conteneur parent */
+                    overflow: hidden; /* Cache tout débordement */
+                }
+
+                .page p {
+                    margin: 0; /* Réinitialiser les marges par défaut des <p> pour un meilleur contrôle */
+                }
+            </style>
         </head>
 
 
@@ -69,7 +85,33 @@ templ documentView(user database.User, doc database.Document) {
                 <!-- The document content -->
                 <div id="editorwrapper" class="flex flex-col items-center justify-center min-h-full gap-y-4">
                     <div class="bg-white shadow-lg" style="width: 794px; height: 1123px;">
-                        <canvas class="" width="794" height="1123" style="z-index: 0; width: 794px; height: 1123px;" dir="ltr"></canvas>
+                        <div id="editor" contenteditable="true" class="page" style="width: 100%; height: 100%; box-sizing: border-box;">
+                        </div>
+
+                        <script>
+                            document.getElementById('editor').addEventListener('keydown', function(event) {
+                                if (event.key === 'Enter') {
+                                    event.preventDefault(); // Empêche le comportement par défaut (ajout d'un <br>)
+
+                                    var selection = window.getSelection();
+                                    var range = selection.getRangeAt(0);
+                                    var editor = document.getElementById('editor');
+
+                                    // Crée un nouveau paragraphe
+                                    var newParagraph = document.createElement('p');
+                                    newParagraph.innerHTML = '&#8203;'; // Utilise un espace non sécable pour rendre le paragraphe visible
+
+                                    // Insère le nouveau paragraphe à la fin du conteneur #editor
+                                    editor.appendChild(newParagraph);
+
+                                    // Positionne le curseur dans le nouveau paragraphe
+                                    range.setStart(newParagraph, 0);
+                                    range.collapse(true);
+                                    selection.removeAllRanges();
+                                    selection.addRange(range);
+                                }
+                            });
+                        </script>
                     </div>
                 </div>
             </main>
