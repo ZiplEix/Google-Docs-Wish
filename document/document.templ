@@ -67,11 +67,9 @@ templ documentView(user database.User, doc database.Document) {
             </header>
             <main class="bg-gray-50 flex flex-col pb-8">
                 <!-- The document content -->
-                <div id="editorwrapper" class="flex-1">
-                    <div class="flex justify-center min-h-full">
-                        <div class="bg-white shadow-lg mt-2" style="width: 794px; height: 1123px;">
-                            <canvas class="" width="794" height="1123" style="z-index: 0; width: 794px; height: 1123px;" dir="ltr"></canvas>
-                        </div>
+                <div id="editorwrapper" class="flex flex-col items-center justify-center min-h-full gap-y-4">
+                    <div class="bg-white shadow-lg" style="width: 794px; height: 1123px;">
+                        <canvas class="" width="794" height="1123" style="z-index: 0; width: 794px; height: 1123px;" dir="ltr"></canvas>
                     </div>
                 </div>
             </main>
