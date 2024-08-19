@@ -84,49 +84,13 @@ templ documentView(user database.User, doc database.Document) {
             <main class="bg-gray-50 flex flex-col pb-8">
                 <!-- The document content -->
                 <div id="editorwrapper" class="flex flex-col items-center justify-center min-h-full gap-y-4">
-                    <div class="bg-white shadow-lg" style="width: 794px; height: 1123px;">
-                        <div id="editor" contenteditable="true" class="page" style="width: 100%; height: 100%; box-sizing: border-box;">
+                    <div class="bg-white shadow-lg" style="width: 794px; height: 1123px;"> <!-- Une page -->
+                        <div contenteditable="true" class="page" style="width: 100%; height: 100%; box-sizing: border-box;">
+                            <!-- Page content here -->
                         </div>
-
-                        <script>
-                            document.getElementById('editor').addEventListener('keydown', function(event) {
-                                if (event.key === 'Enter') {
-                                    event.preventDefault(); // Empêche le comportement par défaut (ajout d'un <br>)
-
-                                    var selection = window.getSelection();
-                                    var range = selection.getRangeAt(0);
-                                    var editor = document.getElementById('editor');
-
-                                    // Crée un nouveau paragraphe
-                                    var newParagraph = document.createElement('p');
-                                    newParagraph.innerHTML = '&#8203;'; // Utilise un espace non sécable pour rendre le paragraphe visible
-
-                                    // Insère le nouveau paragraphe à la fin du conteneur #editor
-                                    editor.appendChild(newParagraph);
-
-                                    // Positionne le curseur dans le nouveau paragraphe
-                                    range.setStart(newParagraph, 0);
-                                    range.collapse(true);
-                                    selection.removeAllRanges();
-                                    selection.addRange(range);
-                                }
-                            });
-
-                            // Fonction pour mettre le focus sur la première page
-                            function focusFirstPage() {
-                                var firstPage = document.getElementById('editor');
-                                if (firstPage) {
-                                    firstPage.focus(); // Met le focus sur la première page
-                                }
-                            }
-
-                            // Attendez que le contenu de la page soit complètement chargé avant de mettre le focus
-                            window.addEventListener('load', function() {
-                                focusFirstPage();
-                            });
-                        </script>
                     </div>
                 </div>
+                <script src="/document_editor/editor.js"></script>
             </main>
         </body>
     </html>
