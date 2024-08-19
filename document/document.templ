@@ -111,6 +111,19 @@ templ documentView(user database.User, doc database.Document) {
                                     selection.addRange(range);
                                 }
                             });
+
+                            // Fonction pour mettre le focus sur la première page
+                            function focusFirstPage() {
+                                var firstPage = document.getElementById('editor');
+                                if (firstPage) {
+                                    firstPage.focus(); // Met le focus sur la première page
+                                }
+                            }
+
+                            // Attendez que le contenu de la page soit complètement chargé avant de mettre le focus
+                            window.addEventListener('load', function() {
+                                focusFirstPage();
+                            });
                         </script>
                     </div>
                 </div>
