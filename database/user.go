@@ -3,6 +3,8 @@ package database
 import (
 	"context"
 	"fmt"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type User struct {
@@ -68,4 +70,17 @@ func (user *User) CreateInDb() (string, error) {
 	}
 
 	return docRef.ID, nil
+}
+
+func GetUserFromCookie(c *fiber.Ctx) (User, error) {
+	userID := c.Locals("userID").(string)
+
+	state, err := FirestoreClient.Doc("users/" + userID).Get(c.Context())
+	if err != nil {
+		return User{}, err
+	}
+
+	user := NewUser(state.Data(), state.Ref.ID)
+
+	return *user, nil
 }

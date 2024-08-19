@@ -1,0 +1,80 @@
+package document
+
+import "github.com/ZiplEix/Google-Docs-Wish/database"
+
+templ documentView(user database.User, doc database.Document) {
+    <!DOCTYPE html>
+    <html lang="en" data-theme="light">
+        <head>
+            <meta charset="UTF-8"/>
+            <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+            <meta name="description" content="A faire"/>
+            <meta name="google" content="notranslate"/>
+            <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.10/dist/full.min.css" rel="stylesheet" type="text/css"/>
+            <script src="https://cdn.tailwindcss.com"></script>
+            <script src="https://unpkg.com/htmx.org@2.0.0" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
+
+            <title>{ doc.Title } - Gdoc Wish</title>
+        </head>
+
+
+        <body>
+            <header class="sticky top-0 z-20 bg-gray-50 pb-4">
+                <div class="navbar bg-gray-50 justify-between px-4 w-full">
+                    <div class="flex items-center">
+                        <a href="/dashboard">
+                            <img src="/ui/doc_icon.png" class="w-12 h-12 mr-2" alt="Document Icon">
+                        </a>
+                        <div>
+                            <input
+                                type="text"
+                                value={ doc.Title }
+                                class="text-2xl pl-1 bg-gray-50 font-semibold rounded-lg hover:outline focus:outline w-full"
+                                style="width: auto;"
+                                id="doc-title-input"
+                                placeholder="Document Title"
+                            />
+                            <p class="text-sm pl-1">Last edited by <strong>{ doc.Author }</strong> on <strong>{ doc.LastModified.Format("January 2 2006") }</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="flex-none gap-2">
+                        <div class="dropdown dropdown-end h-12">
+                            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+                                <div class="w-12 rounded-full">
+                                    <img alt="Menu button" src="/persona-black.png"/>
+                                </div>
+                            </div>
+                            <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[2] mt-3 w-52 p-2 shadow">
+                                <li><a>Profile</a></li>
+                                <li><a>Settings</a></li>
+                                <li>
+                                    <button hx-post="/auth/signout" class="">Logout</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- The toolbar -->
+                <div class="bg-gray-50">
+                    <div class="flex bg-blue-50 min-h-10 mx-4 rounded-full">
+                        <!-- Toolbar content here -->
+                    </div>
+                </div>
+            </header>
+            <main class="bg-gray-50 min-h-screen flex flex-col">
+                <!-- The document content -->
+                <div id="editorwrapper" class="flex-1">
+                    <div class="flex justify-center min-h-full">
+                        <div class="bg-white shadow-lg mt-2" style="width: 794px; height: 1123px;">
+                            <canvas class="" width="794" height="1123" style="z-index: 0; width: 794px; height: 1123px;" dir="ltr"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </body>
+    </html>
+}

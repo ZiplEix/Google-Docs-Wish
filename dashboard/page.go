@@ -7,21 +7,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/adaptor"
 )
 
-func getUserFromCookie(c *fiber.Ctx) (database.User, error) {
-	userID := c.Locals("userID").(string)
-
-	state, err := database.FirestoreClient.Doc("users/" + userID).Get(c.Context())
-	if err != nil {
-		return database.User{}, err
-	}
-
-	user := database.NewUser(state.Data(), state.Ref.ID)
-
-	return *user, nil
-}
-
 func dashboardPage(c *fiber.Ctx) error {
-	user, err := getUserFromCookie(c)
+	user, err := database.GetUserFromCookie(c)
 	rootId := c.Params("rootId")
 
 	if rootId == "" {

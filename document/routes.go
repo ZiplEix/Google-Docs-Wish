@@ -5,7 +5,9 @@ import (
 
 	"github.com/ZiplEix/Google-Docs-Wish/database"
 	"github.com/ZiplEix/Google-Docs-Wish/middleware"
+	"github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
 )
 
 func DocumentRoutes(app *fiber.App) {
@@ -27,9 +29,34 @@ func redirectToDashboard(c *fiber.Ctx) error {
 }
 
 func documentPage(c *fiber.Ctx) error {
+	user, err := database.GetUserFromCookie(c)
+	if err != nil {
+		c.Set("HX-Redirect", "/auth/signin")
+		return c.Status(fiber.StatusInternalServerError).Redirect("/auth/signin")
+	}
+
 	docId := c.Params("docId")
 
-	return c.SendString("Document: " + docId)
+	if docId == "" {
+		c.Set("HX-Redirect", "/dashboard")
+		return c.Status(fiber.StatusNotFound).Redirect("/dashboard")
+	}
+
+	doc, err := database.GetDocumentFromId(docId)
+	if err != nil {
+		c.Set("HX-Redirect", "/dashboard/root")
+		return c.Status(fiber.StatusNotFound).Redirect("/dashboard")
+	}
+
+	if doc.Type != "document" {
+		c.Set("HX-Redirect", "/dashboard/root")
+		return c.Status(fiber.StatusNotFound).Redirect("/dashboard")
+	}
+
+	page := documentView(user, *doc)
+	handler := adaptor.HTTPHandler(templ.Handler(page))
+
+	return handler(c)
 }
 
 func createNewDocument(c *fiber.Ctx) error {
