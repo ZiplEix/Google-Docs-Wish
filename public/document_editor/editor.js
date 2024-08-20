@@ -44,6 +44,14 @@ document.addEventListener('DOMContentLoaded', function() {
         return editor.scrollHeight > editor.clientHeight;
     }
 
+    function addParagraphToNextPage(nextPage) {
+        var firstParagraph = document.createElement('p');
+        firstParagraph.innerHTML = '&#8203;'; // Utilise un espace non sécable pour rendre le paragraphe visible
+        firstParagraph.id = generateUUID(); // Ajouter un UUID au paragraphe
+        nextPage.insertBefore(firstParagraph, nextPage.firstChild); // Insère le paragraphe au début de la page
+        return firstParagraph;
+    }
+
     document.getElementById('editorwrapper').addEventListener('keydown', function(event) {
         if (event.key === 'Enter') {
             event.preventDefault(); // Empêche le comportement par défaut (ajout d'un <br>)
@@ -59,21 +67,32 @@ document.addEventListener('DOMContentLoaded', function() {
             // Ajouter un UUID au paragraphe
             newParagraph.id = generateUUID();
 
-            // Insère le nouveau paragraphe à la fin du conteneur #editor
-            editor.appendChild(newParagraph);
-
-            // Positionne le curseur dans le nouveau paragraphe
-            range.setStart(newParagraph, 0);
-            range.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(range);
-
             // Trouve la page actuelle
             var currentPage = editor.closest('.bg-white.shadow-lg');
+            var nextPage = currentPage.nextElementSibling ? currentPage.nextElementSibling.querySelector('.page') : null;
 
-            // Si la page actuelle est pleine, ajoute une nouvelle page après la page actuelle
             if (isPageFull(editor)) {
-                addNewPage(currentPage);
+                // Si la page actuelle est pleine
+                if (nextPage) {
+                    // S'il y a une page suivante, ajoute le paragraphe au début de la page suivante
+                    var firstParagraph = addParagraphToNextPage(nextPage);
+                    // Positionne le curseur dans le nouveau paragraphe sur la page suivante
+                    range.setStart(firstParagraph, 0);
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                } else {
+                    // Sinon, ajoute une nouvelle page après la page actuelle
+                    addNewPage(currentPage);
+                }
+            } else {
+                // Si la page actuelle n'est pas pleine, ajoute le paragraphe à la fin
+                editor.appendChild(newParagraph);
+                // Positionne le curseur dans le nouveau paragraphe
+                range.setStart(newParagraph, 0);
+                range.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(range);
             }
         }
     });
