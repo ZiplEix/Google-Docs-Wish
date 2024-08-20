@@ -52,6 +52,15 @@ document.addEventListener('DOMContentLoaded', function() {
         firstParagraph.innerHTML = 'New paragraphe';
         firstParagraph.id = generateUUID(); // Ajouter un UUID au paragraphe
         nextPage.insertBefore(firstParagraph, nextPage.firstChild); // Insère le paragraphe au début de la page
+
+        // set the cursor at the end of the new paragraph
+        var selection = window.getSelection();
+        var range = document.createRange();
+        range.setStart(firstParagraph, 1);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+
         return firstParagraph;
     }
 
@@ -116,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (currentParagraph.previousSibling) {
                         currentParagraph.parentNode.insertBefore(newParagraph, currentParagraph);
                     } else {
-                        editor.insertBefore(newParagraph, currentParagraph);
+                        currentParagraph.insertBefore(newParagraph, currentParagraph.firstChild);
                     }
                     cursorInNewParagraph = false;
                 } else {
