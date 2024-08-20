@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Si le curseur est au début du paragraphe, insère le nouveau paragraphe avant celui-ci
                 if (range.startOffset === 0 && range.endOffset === 0) {
                     // Insère le nouveau paragraphe avant le paragraphe actuel
-                    var currentParagraph = range.startContainer;
+                    var currentParagraph = range.startContainer.parentNode;
                     currentParagraph.parentNode.insertBefore(newParagraph, currentParagraph);
                     cursorInNewParagraph = false;
                 } else {
