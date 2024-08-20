@@ -37,6 +37,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Optionnel: mettre le focus sur la nouvelle page
         newEditor.focus();
+
+        return newEditor;
     }
 
     function isPageFull(editor) {
@@ -85,19 +87,36 @@ document.addEventListener('DOMContentLoaded', function() {
                     selection.addRange(range);
                 } else {
                     // Sinon, ajoute une nouvelle page après la page actuelle
-                    addNewPage(currentPage);
+                    editor.blur(); // Retire le focus de l'éditeur
+                    var newEditor = addNewPage(currentPage);
+                    var firstParagraph = document.createElement('p');
+                    firstParagraph.innerHTML = '&';
+                    firstParagraph.id = generateUUID();
+                    newEditor.appendChild(firstParagraph);
+
+                    // Positionne le curseur dans le nouveau paragraphe sur la nouvelle page
+                    range.setStart(firstParagraph, 1);
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
                 }
             } else {
+                var currentParagraph = range.startContainer.parentNode;
+
                 // Si la page actuelle n'est pas pleine
                 // Si le curseur est au début du paragraphe, insère le nouveau paragraphe avant celui-ci
                 if (range.startOffset === 0 && range.endOffset === 0) {
                     // Insère le nouveau paragraphe avant le paragraphe actuel
-                    var currentParagraph = range.startContainer.parentNode;
                     currentParagraph.parentNode.insertBefore(newParagraph, currentParagraph);
                     cursorInNewParagraph = false;
                 } else {
-                    // Sinon, ajoute le paragraphe à la fin
-                    editor.appendChild(newParagraph);
+                    // Sinon, ajoute le paragraphe après le paragraphe actuel
+                    var nextSibling = currentParagraph.nextSibling;
+                    if (nextSibling) {
+                        currentParagraph.parentNode.insertBefore(newParagraph, nextSibling);
+                    } else {
+                        editor.appendChild(newParagraph);
+                    }
                 }
                 // Positionne le curseur dans le nouveau paragraphe
                 if (cursorInNewParagraph) {
