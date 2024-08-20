@@ -49,10 +49,26 @@ document.addEventListener('DOMContentLoaded', function() {
     function addParagraphToNextPage(nextPage) {
         var firstParagraph = document.createElement('p');
         // Utilisez un espace non sécable pour rendre le paragraphe visible
-        firstParagraph.innerHTML = '&nbsp;';
+        firstParagraph.innerHTML = 'New paragraphe';
         firstParagraph.id = generateUUID(); // Ajouter un UUID au paragraphe
         nextPage.insertBefore(firstParagraph, nextPage.firstChild); // Insère le paragraphe au début de la page
         return firstParagraph;
+    }
+
+    function createFirstParagraphOnPageAndSelectIt(page) {
+        var firstParagraph = document.createElement('p');
+        firstParagraph.innerHTML = '&';
+        firstParagraph.id = generateUUID();
+        page.appendChild(firstParagraph);
+
+        var selection = window.getSelection();
+        var range = document.createRange();
+        range.setStart(firstParagraph, 1);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        page.focus(); // Met le focus sur la page
     }
 
     document.getElementById('editorwrapper').addEventListener('keydown', function(event) {
@@ -89,16 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Sinon, ajoute une nouvelle page après la page actuelle
                     editor.blur(); // Retire le focus de l'éditeur
                     var newEditor = addNewPage(currentPage);
-                    var firstParagraph = document.createElement('p');
-                    firstParagraph.innerHTML = '&';
-                    firstParagraph.id = generateUUID();
-                    newEditor.appendChild(firstParagraph);
-
-                    // Positionne le curseur dans le nouveau paragraphe sur la nouvelle page
-                    range.setStart(firstParagraph, 1);
-                    range.collapse(true);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
+                    createFirstParagraphOnPageAndSelectIt(newEditor);
                 }
             } else {
                 var currentParagraph = range.startContainer.parentNode;
@@ -106,8 +113,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Si la page actuelle n'est pas pleine
                 // Si le curseur est au début du paragraphe, insère le nouveau paragraphe avant celui-ci
                 if (range.startOffset === 0 && range.endOffset === 0) {
-                    // Insère le nouveau paragraphe avant le paragraphe actuel
-                    currentParagraph.parentNode.insertBefore(newParagraph, currentParagraph);
+                    if (currentParagraph.previousSibling) {
+                        currentParagraph.parentNode.insertBefore(newParagraph, currentParagraph);
+                    } else {
+                        editor.insertBefore(newParagraph, currentParagraph);
+                    }
                     cursorInNewParagraph = false;
                 } else {
                     // Sinon, ajoute le paragraphe après le paragraphe actuel
@@ -132,21 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('load', function() {
         var firstPage = document.querySelector('#editorwrapper .page');
         if (firstPage) {
-            // create the first p
-            var firstParagraph = document.createElement('p');
-            firstParagraph.innerHTML = '&';
-            firstParagraph.id = generateUUID();
-            firstPage.appendChild(firstParagraph);
-
-            // put the cursor at the end of the first p
-            var selection = window.getSelection();
-            var range = document.createRange();
-            range.setStart(firstParagraph, 1);
-            range.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(range);
-
-            firstPage.focus(); // Met le focus sur la première page
+            createFirstParagraphOnPageAndSelectIt(firstPage);
         }
     });
 });
