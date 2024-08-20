@@ -46,7 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function addParagraphToNextPage(nextPage) {
         var firstParagraph = document.createElement('p');
-        firstParagraph.innerHTML = '&#8203;'; // Utilise un espace non sécable pour rendre le paragraphe visible
+        // Utilisez un espace non sécable pour rendre le paragraphe visible
+        firstParagraph.innerHTML = '&#8203;';
         firstParagraph.id = generateUUID(); // Ajouter un UUID au paragraphe
         nextPage.insertBefore(firstParagraph, nextPage.firstChild); // Insère le paragraphe au début de la page
         return firstParagraph;
@@ -62,10 +63,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Crée un nouveau paragraphe
             var newParagraph = document.createElement('p');
-            newParagraph.innerHTML = '&#8203;'; // Utilise un espace non sécable pour rendre le paragraphe visible
-
-            // Ajouter un UUID au paragraphe
-            newParagraph.id = generateUUID();
+            // Utilisez un espace non sécable pour rendre le paragraphe visible
+            newParagraph.innerHTML = '&#8203;';
+            newParagraph.id = generateUUID(); // Ajouter un UUID au paragraphe
 
             // Trouve la page actuelle
             var currentPage = editor.closest('.bg-white.shadow-lg');
@@ -86,8 +86,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     addNewPage(currentPage);
                 }
             } else {
-                // Si la page actuelle n'est pas pleine, ajoute le paragraphe à la fin
-                editor.appendChild(newParagraph);
+                // Si la page actuelle n'est pas pleine
+                // Si le curseur est au début du paragraphe, insère le nouveau paragraphe avant celui-ci
+                if (range.startOffset === 0 && range.endOffset === 0) {
+                    // Insère le nouveau paragraphe avant le paragraphe actuel
+                    var currentParagraph = range.startContainer;
+                    currentParagraph.parentNode.insertBefore(newParagraph, currentParagraph);
+                } else {
+                    // Sinon, ajoute le paragraphe à la fin
+                    editor.appendChild(newParagraph);
+                }
                 // Positionne le curseur dans le nouveau paragraphe
                 range.setStart(newParagraph, 0);
                 range.collapse(true);
@@ -101,6 +109,11 @@ document.addEventListener('DOMContentLoaded', function() {
         var firstPage = document.querySelector('#editorwrapper .page');
         if (firstPage) {
             firstPage.focus(); // Met le focus sur la première page
+            // add the first paragraph
+            var firstParagraph = document.createElement('p');
+            firstParagraph.innerHTML = '&#8203;';
+            firstParagraph.id = generateUUID(); // Ajouter un UUID au paragraphe
+            firstPage.appendChild(firstParagraph);
         }
     });
 });
