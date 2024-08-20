@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function addParagraphToNextPage(nextPage) {
         var firstParagraph = document.createElement('p');
         // Utilisez un espace non sécable pour rendre le paragraphe visible
-        firstParagraph.innerHTML = '&#8203;';
+        firstParagraph.innerHTML = '&nbsp;';
         firstParagraph.id = generateUUID(); // Ajouter un UUID au paragraphe
         nextPage.insertBefore(firstParagraph, nextPage.firstChild); // Insère le paragraphe au début de la page
         return firstParagraph;
@@ -64,12 +64,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Crée un nouveau paragraphe
             var newParagraph = document.createElement('p');
             // Utilisez un espace non sécable pour rendre le paragraphe visible
-            newParagraph.innerHTML = '&#8203;';
+            newParagraph.innerHTML = '&';
             newParagraph.id = generateUUID(); // Ajouter un UUID au paragraphe
 
             // Trouve la page actuelle
             var currentPage = editor.closest('.bg-white.shadow-lg');
             var nextPage = currentPage.nextElementSibling ? currentPage.nextElementSibling.querySelector('.page') : null;
+
+            var cursorInNewParagraph = true;
 
             if (isPageFull(editor)) {
                 // Si la page actuelle est pleine
@@ -92,15 +94,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Insère le nouveau paragraphe avant le paragraphe actuel
                     var currentParagraph = range.startContainer;
                     currentParagraph.parentNode.insertBefore(newParagraph, currentParagraph);
+                    cursorInNewParagraph = false;
                 } else {
                     // Sinon, ajoute le paragraphe à la fin
                     editor.appendChild(newParagraph);
                 }
                 // Positionne le curseur dans le nouveau paragraphe
-                range.setStart(newParagraph, 0);
-                range.collapse(true);
-                selection.removeAllRanges();
-                selection.addRange(range);
+                if (cursorInNewParagraph) {
+                    range.setStart(newParagraph, 1);
+                    range.collapse(true);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
             }
         }
     });
@@ -108,12 +113,21 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('load', function() {
         var firstPage = document.querySelector('#editorwrapper .page');
         if (firstPage) {
-            firstPage.focus(); // Met le focus sur la première page
-            // add the first paragraph
+            // create the first p
             var firstParagraph = document.createElement('p');
-            firstParagraph.innerHTML = '&#8203;';
-            firstParagraph.id = generateUUID(); // Ajouter un UUID au paragraphe
+            firstParagraph.innerHTML = '&';
+            firstParagraph.id = generateUUID();
             firstPage.appendChild(firstParagraph);
+
+            // put the cursor at the end of the first p
+            var selection = window.getSelection();
+            var range = document.createRange();
+            range.setStart(firstParagraph, 1);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            firstPage.focus(); // Met le focus sur la première page
         }
     });
 });
