@@ -128,7 +128,24 @@ document.addEventListener('DOMContentLoaded', function() {
                         currentParagraph.insertBefore(newParagraph, currentParagraph.firstChild);
                     }
                     cursorInNewParagraph = false;
-                } else {
+                }
+                // if the cursor is not at the end of the paragraph
+                else if (range.startOffset !== currentParagraph.textContent.length) {
+                    console.log('range.startOffset:', range.startOffset);
+                    console.log('range.endOffset:', range.endOffset);
+                    console.log('currentParagraph.textContent.lenght:', currentParagraph.textContent.length);
+
+                    var textBeforeCursor = currentParagraph.textContent.substring(0, range.startOffset);
+                    var textAfterCursor = currentParagraph.textContent.substring(range.endOffset);
+
+                    console.log('textBeforeCursor:', textBeforeCursor);
+                    console.log('textAfterCursor:', textAfterCursor);
+                    // currentParagraph.textContent = textBeforeCursor;
+                    // newParagraph.textContent = textAfterCursor;
+                    // currentParagraph.parentNode.insertBefore(newParagraph, currentParagraph.nextSibling);
+                    // cursorInNewParagraph = false;
+                }
+                else {
                     // Sinon, ajoute le paragraphe après le paragraphe actuel
                     var nextSibling = currentParagraph.nextSibling;
                     if (nextSibling) {

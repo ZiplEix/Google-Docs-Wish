@@ -1,0 +1,6 @@
+Actuellement si j'appuis sur entré un nouveau paragraphe est créer à la fin de la liste des paragraphe. il faut modifier ce comportement.
+
+- Si mon curseur est au début du paragraphe et que j'appuis sur entré alors il faut créer le nouveau paragraphe avant celui ou est mon curseur.
+- Si mon curseur est au début du paragraphe et que le paragraphe est vide et que j'appuis sur entré alors il faut créer le nouveau paragraphe après celui ou est mon curseur.
+- Si mon curseur est au milieu du paragraphe alors il faut créer un nouveau paragraphe après le paragraphe ou est mon curseur. le nouveau paragraphe doit contenir tout le text qui était à gauche de mon curseur dans l'ancient paragraphe
+- Si mon curseur est à la fin du paragraphe alors il faut créer le nouveau paragraphe après celui ou est mon curseur
